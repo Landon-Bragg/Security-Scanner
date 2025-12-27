@@ -1,0 +1,10 @@
+
+# Python cache files contain test secrets
+__pycache__/
+*.pyc
+*.pyo
+
+# Test files with intentional fake secrets
+scripts/demo_scanner.py
+tests/conftest.py
+tests/test_secret_scanner.py
