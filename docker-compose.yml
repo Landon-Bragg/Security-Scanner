@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: ghsec-postgres
+    environment:
+      POSTGRES_DB: github_security
+      POSTGRES_USER: ghsec_user
+      POSTGRES_PASSWORD: ghsec_password
+    ports:
+      - "5433:5432"  # Changed from 5432:5432 to avoid conflict
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ghsec_user -d github_security"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for streaming
+  redis:
+    image: redis:7-alpine
+    container_name: ghsec-redis
+    ports:
+      - "6380:6379"  # Changed from 6379:6379 to avoid conflict
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI Application
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ghsec-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://ghsec_user:ghsec_password@postgres:5432/github_security
+      - REDIS_URL=redis://redis:6379/0
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Scanner Worker
+  scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ghsec-scanner
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://ghsec_user:ghsec_password@postgres:5432/github_security
+      - REDIS_URL=redis://redis:6379/0
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+    command: python -m src.scanner.worker
+
+  # Vulnerability Monitor
+  vuln_monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ghsec-vuln-monitor
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://ghsec_user:ghsec_password@postgres:5432/github_security
+      - REDIS_URL=redis://redis:6379/0
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+    command: python -m src.scanner.vuln_monitor
+
+volumes:
+  postgres_data:
+  redis_data:
