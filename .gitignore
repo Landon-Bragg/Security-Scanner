@@ -1,10 +1,83 @@
-
-# Python cache files contain test secrets
+# Python
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Test files with intentional fake secrets
-scripts/demo_scanner.py
-tests/conftest.py
-tests/test_secret_scanner.py
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Environment Variables (CRITICAL - contains your real GitHub token)
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Database
+*.db
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Docker
+*.pid
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+data/
+temp/
+*.tmp
+
+# Personal notes and planning documents (stuff you don't want recruiters to see)
+NOTES.md
+TODO.md
+PERSONAL_NOTES.md
+PROJECT_PLANNING.md
+INTERVIEW_PREP.md
+*_PRIVATE.md
+notes/
+planning/
+
+# Company-specific customizations
+*_cisco.md
+*_tailored.md
+company_specific/
+
+# Remove any files that were specifically for the tutorial
+*_COMPLETE.md
+*_STARTED.md
+*_NAVIGATION.md
