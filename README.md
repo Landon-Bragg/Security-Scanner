@@ -1,4 +1,3 @@
-cat > README.md << 'EOF'
 # GitHub Security Intelligence Pipeline
 
 A production-grade security monitoring system that automatically scans GitHub repositories for exposed secrets in real-time.
