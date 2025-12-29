@@ -1,6 +1,7 @@
 """
 Main FastAPI application for GitHub Security Intelligence Pipeline
 """
+
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -27,7 +28,7 @@ app = FastAPI(
     title="GitHub Security Intelligence Pipeline",
     description="Real-time security monitoring for GitHub repositories",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # CORS middleware
@@ -51,5 +52,5 @@ async def root():
     return {
         "message": "GitHub Security Intelligence Pipeline API",
         "version": "1.0.0",
-        "docs": "/docs"
+        "docs": "/docs",
     }

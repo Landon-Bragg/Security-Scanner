@@ -1,6 +1,7 @@
 """
 Pydantic schemas for API requests and responses
 """
+
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, Dict, Any
 from datetime import datetime
@@ -8,8 +9,9 @@ from datetime import datetime
 
 class FindingResponse(BaseModel):
     """Response model for security finding"""
+
     model_config = ConfigDict(from_attributes=True)
-    
+
     id: int
     repository_id: int
     finding_type: str
@@ -32,6 +34,7 @@ class FindingResponse(BaseModel):
 
 class FindingStats(BaseModel):
     """Statistics about findings"""
+
     total_findings: int
     by_severity: Dict[str, int]
     by_type: Dict[str, int]
@@ -41,6 +44,7 @@ class FindingStats(BaseModel):
 
 class RepositoryStats(BaseModel):
     """Statistics for a repository"""
+
     repository_name: str
     repository_id: int
     finding_count: int
@@ -49,6 +53,7 @@ class RepositoryStats(BaseModel):
 
 class WebhookEvent(BaseModel):
     """GitHub webhook event"""
+
     event_type: str
     repository: str
     sender: str

@@ -1,6 +1,7 @@
 """
 Pytest configuration and fixtures
 """
+
 import pytest
 import asyncio
 from typing import AsyncGenerator
@@ -28,35 +29,35 @@ def event_loop():
 async def test_db() -> AsyncGenerator[AsyncSession, None]:
     """Create a test database session"""
     engine = create_async_engine(TEST_DATABASE_URL, echo=False)
-    
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    
+
     async_session = async_sessionmaker(
         engine, class_=AsyncSession, expire_on_commit=False
     )
-    
+
     async with async_session() as session:
         yield session
-    
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
-    
+
     await engine.dispose()
 
 
 @pytest.fixture
 async def client(test_db: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     """Create a test client"""
-    
+
     async def override_get_db():
         yield test_db
-    
+
     app.dependency_overrides[get_db] = override_get_db
-    
+
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
-    
+
     app.dependency_overrides.clear()
 
 
@@ -108,20 +109,17 @@ def sample_push_event():
                 "private": False,
                 "description": "Test repository",
                 "stargazers_count": 10,
-                "language": "Python"
+                "language": "Python",
             },
             "commits": [
                 {
                     "id": "abc123def456",
                     "message": "Add new feature",
-                    "author": {
-                        "name": "Test User",
-                        "email": "test@example.com"
-                    },
+                    "author": {"name": "Test User", "email": "test@example.com"},
                     "added": ["new_file.py"],
                     "modified": ["existing_file.py"],
-                    "removed": []
+                    "removed": [],
                 }
-            ]
-        }
+            ],
+        },
     }
